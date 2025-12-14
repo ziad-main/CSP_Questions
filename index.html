@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSP MCQ Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .section-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+            -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .section-card:active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .section-card h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        .section-card p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .quiz-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+            position: relative;
+        }
+
+        .quiz-header h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .back-to-sections-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .back-to-sections-btn:hover {
+            background: #5a6268;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            line-height: 1.6;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .choice {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.05em;
+            -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .choice:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
+        .choice:active:not(.disabled) {
+            transform: scale(0.98);
+        }
+
+        .choice.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .choice.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .choice.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .choice.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        button:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .score-display {
+            text-align: center;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .score-display h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+
+            .section-card {
+                padding: 20px;
+            }
+
+            .section-card h2 {
+                font-size: 1.5em;
+            }
+
+            .quiz-container {
+                padding: 20px;
+            }
+
+            .quiz-header h2 {
+                font-size: 1.5em;
+                padding-right: 140px; /* Make room for back button */
+            }
+
+            .back-to-sections-btn {
+                font-size: 0.85em;
+                padding: 8px 15px;
+            }
+
+            .question h3 {
+                font-size: 1.1em;
+            }
+
+            .choice {
+                padding: 12px 15px;
+                font-size: 1em;
+            }
+
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            button {
+                width: 100%;
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sections-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CSP MCQ Quiz</h1>
+
+        <div id="sectionsView" class="sections-grid">
+            <div class="section-card" onclick="startQuiz(1)">
+                <h2>Section 1</h2>
+                <p>Defining CSPs</p>
+                <p style="margin-top: 10px; color: #999;">72 Questions</p>
+            </div>
+            <div class="section-card" onclick="startQuiz(2)">
+                <h2>Section 2</h2>
+                <p>Constraint Propagation</p>
+                <p style="margin-top: 10px; color: #999;">68 Questions</p>
+            </div>
+            <div class="section-card" onclick="startQuiz(3)">
+                <h2>Section 3</h2>
+                <p>Backtracking Search</p>
+                <p style="margin-top: 10px; color: #999;">60 Questions</p>
+            </div>
+            <div class="section-card" onclick="startQuiz(4)">
+                <h2>Section 4</h2>
+                <p>Local Search</p>
+                <p style="margin-top: 10px; color: #999;">45 Questions</p>
+            </div>
+            <div class="section-card" onclick="startQuiz(5)">
+                <h2>Section 5</h2>
+                <p>Structure of Problems</p>
+                <p style="margin-top: 10px; color: #999;">34 Questions</p>
+            </div>
+        </div>
+
+        <div id="quizView" class="quiz-container">
+            <div class="quiz-header">
+                <button class="back-to-sections-btn" onclick="backToSections()">← Back to Sections</button>
+                <h2 id="sectionTitle"></h2>
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <div class="question">
+                <h3 id="questionText"></h3>
+                <div class="choices" id="choices"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>← Previous Question</button>
+                <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>Next Question →</button>
+            </div>
+
+            <div class="score-display">
+                <h3>Progress</h3>
+                <p id="scoreText">Correct: 0 | Incorrect: 0</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quizData = {
+            1: [
+                // Questions 1-36 (Page 4)
+                {q: "In a constraint graph, edges represent:", choices: ["Variables", "Domains", "Binary constraints", "Costs"], correct: 2},
+                {q: "A constraint hypergraph is used when:", choices: ["All constraints are unary", "Constraints involve 2 variables", "Constraints involve 3 or more variables", "The domains are continuous"], correct: 2},
+                {q: "In a dual graph, what becomes a node?", choices: ["Each variable", "Each domain", "Each constraint", "Each value in the domain"], correct: 2},
+                {q: "The main purpose of the dual graph is:", choices: ["Visualizing unary constraints", "Eliminating variables", "Converting n-ary CSPs into binary CSPs", "Reducing domain size"], correct: 2},
+                {q: "In a hypergraph, a square node represents:", choices: ["A variable", "A domain", "A constraint involving many variables", "A solution"], correct: 2},
+                {q: "A CSP state is represented as:", choices: ["A single black-box node", "A set of variables with values", "A path from start to goal", "A linear inequality"], correct: 1},
+                {q: "What is a consistent assignment?", choices: ["Every variable is assigned", "No constraint is violated", "All values are different", "Variable domains are infinite"], correct: 1},
+                {q: "Map coloring uses which type of domain?", choices: ["Continuous", "Infinite", "Discrete finite", "Global"], correct: 2},
+                {q: "A binary CSP includes:", choices: ["Only unary constraints", "Only n-ary constraints", "Only unary and binary constraints", "Only preference constraints"], correct: 2},
+                {q: "Alldiff is what type of constraint?", choices: ["Unary", "Binary", "Global", "Disjunctive"], correct: 2},
+                {q: "Disjunctive constraints express:", choices: ["Variables must be equal", "At least one of two conditions must hold", "All variables must differ", "Domains are continuous"], correct: 1},
+                {q: "Which CSP type is undecidable?", choices: ["Linear constraints", "Nonlinear constraints over integers", "Binary constraints", "Map coloring"], correct: 1},
+                {q: "Preference constraints turn a CSP into:", choices: ["A search problem", "A SAT problem", "A constrained optimization problem (COP)", "A linear program"], correct: 2},
+                {q: "A CSP state is represented as:", choices: ["An atomic state with no structure", "A set of variable → value assignments", "A cost function with penalty weights", "A path of actions from the initial state"], correct: 1},
+                {q: "A complete assignment must satisfy:", choices: ["All constraints but not necessarily assign all variables", "All variables assigned, may violate some constraints", "Every variable assigned AND no constraint violated", "At least one solution path must exist"], correct: 2},
+                {q: "Which of the following is correct about CSP solvers?", choices: ["They require domain-specific heuristics for every problem", "They treat each state as atomic", "They exploit structure to prune the search space", "They cannot detect partial inconsistencies"], correct: 2},
+                {q: "Solving general CSPs is:", choices: ["Polynomial", "NP-complete", "Undecidable", "Exponential for finite domains"], correct: 1},
+                {q: "A partial assignment is consistent if:", choices: ["It assigns all variables", "It avoids violating any constraints so far", "The constraint graph is acyclic", "The domains are discrete"], correct: 1},
+                {q: "Why is CSP formulation better for map coloring than atomic search?", choices: ["Atomic search cannot assign colors", "Atomic search cannot represent states", "CSP quickly eliminates multiple invalid choices via constraints", "CSP guarantees polynomial time"], correct: 2},
+                {q: "The constraint \"SA ≠ WA\" can be represented as:", choices: ["A unary constraint on SA", "A global constraint", "A binary relation with allowed tuples", "A preference constraint"], correct: 2},
+                {q: "The precedence constraint \"AxleF + 10 ≤ WheelRF\" is:", choices: ["Unary", "Binary", "Disjunctive", "Global"], correct: 1},
+                {q: "A disjunctive constraint is used when:", choices: ["One task absolutely must precede another", "Tasks cannot overlap and order is flexible", "Domains must be equal", "Values must be all different"], correct: 1},
+                {q: "Setting the domain Di = {0...30} for all tasks is:", choices: ["A unary constraint", "A binary constraint", "A global constraint", "A preference constraint"], correct: 0},
+                {q: "Which domain type allows infinite possible values?", choices: ["Boolean domain", "3-coloring domain", "Integer domain", "Finite domain CSP"], correct: 2},
+                {q: "Which CSP type is undecidable in the general case?", choices: ["Linear constraints over integers", "Nonlinear constraints over integers", "Linear programming problems", "Finite-domain binary CSPs"], correct: 1},
+                {q: "Linear programming CSPs have what special property?", choices: ["Can be solved in polynomial time", "Require backtracking", "Require constraint graphs", "Must use preference constraints"], correct: 0},
+                {q: "A continuous-domain CSP is commonly used in:", choices: ["Sudoku", "Job-shop scheduling", "Telescope observation timing", "Map coloring"], correct: 2},
+                {q: "A unary constraint restricts:", choices: ["A single variable's allowable values", "Two variables", "Many variables", "Domain sizes"], correct: 0},
+                {q: "A binary constraint:", choices: ["Is always represented by an equation", "Connects two variables", "Is used only in scheduling", "Requires infinite domains"], correct: 1},
+                {q: "A cryptarithmetic puzzle uses which type of constraint heavily?", choices: ["Unary only", "Preference constraints", "Global Alldiff constraint", "Disjunctive constraints"], correct: 2},
+                {q: "\"X < Y < Z\" is an example of a:", choices: ["Unary constraint", "Binary constraint", "Ternary constraint", "Preference constraint"], correct: 2},
+                {q: "A constraint graph contains edges between variables that:", choices: ["Have the same domain", "Share a constraint", "Have different values", "Appear in the same preference rule"], correct: 1},
+                {q: "A constraint hypergraph is required when:", choices: ["All constraints are binary", "Constraints involve more than 2 variables", "Domains are infinite", "The CSP is over continuous variables"], correct: 1},
+                {q: "In a dual graph, each node represents:", choices: ["A variable", "A domain", "A constraint", "A solution"], correct: 2},
+                {q: "When converting to a dual graph, binary edges are drawn between constraints that:", choices: ["Are violated by the same assignment", "Contain the same variables", "Have the same number of tuples", "Have equal cost"], correct: 1},
+                {q: "Why might we prefer a global constraint (like Alldiff) instead of equivalent binary constraints?", choices: ["Global constraints are always easier", "Global constraints allow more efficient inference algorithms", "Binary constraints cannot express Alldiff", "Binary constraints make CSP unsolvable"], correct: 1},
+
+                // Questions 37-72 (Page 5)
+                {q: "A CSP is formally defined by which triple?", choices: ["⟨States, Actions, Goal⟩", "⟨Variables, Constraints, Solutions⟩", "⟨Variables, Domains, Constraints⟩", "⟨Nodes, Edges, Costs⟩"], correct: 2},
+                {q: "In a CSP, the domain Di represents:", choices: ["All constraints involving Xi", "The allowed values for Xi", "All neighbors of Xi", "Only values used in solutions"], correct: 1},
+                {q: "Two variables in a CSP may:", choices: ["Always have the same domain", "Always have domains of equal size", "Have different domains of different sizes", "Share a domain"], correct: 2},
+                {q: "A constraint is defined as:", choices: ["A restriction on a single variable", "A tuple of values", "A scope and a relation", "A domain reduction rule"], correct: 2},
+                {q: "The scope of a constraint refers to:", choices: ["The values allowed", "The variables involved", "The domain size", "The constraint graph"], correct: 1},
+                {q: "A relation in a constraint can be represented as:", choices: ["Only an explicit table of tuples", "Only a Boolean variable", "Either explicit tuples or a function", "A domain"], correct: 2},
+                {q: "Which of the following is a consistent assignment?", choices: ["Assigns all variables", "Assigns no variables", "Violates no constraints", "Is a solution"], correct: 2},
+                {q: "A solution to a CSP must be:", choices: ["Partial and consistent", "Complete and consistent", "Partial and complete", "Complete but possibly inconsistent"], correct: 1},
+                {q: "Which statement is TRUE?", choices: ["Every consistent assignment is a solution", "Every solution is complete", "Every partial assignment is inconsistent", "Every solution is partial"], correct: 1},
+                {q: "A partial solution is:", choices: ["A complete assignment", "An inconsistent assignment", "A consistent partial assignment", "An optimal assignment"], correct: 2},
+                {q: "Why is solving a CSP NP-complete in general?", choices: ["Because domains are large", "Because constraints are unary", "Because CSPs subsume many hard problems", "Because arc consistency is incomplete"], correct: 2},
+                {q: "In the Australia map-coloring CSP, how many variables are there?", choices: ["6", "7", "8", "9"], correct: 1},
+                {q: "In the Australia CSP, how many constraints are explicitly listed?", choices: ["7", "8", "9", "12"], correct: 2},
+                {q: "The constraint \"SA ≠ WA\" is an example of:", choices: ["Unary constraint", "Binary constraint", "Global constraint", "Preference constraint"], correct: 1},
+                {q: "The enumerated form of SA ≠ WA contains:", choices: ["All possible value pairs", "Only inconsistent pairs", "Only consistent pairs", "Only solutions"], correct: 2},
+                {q: "A constraint graph:", choices: ["Has values as nodes", "Has constraints as nodes", "Has variables as nodes", "Has domains as edges"], correct: 2},
+                {q: "Two variables are connected by an edge in the constraint graph if:", choices: ["They share the same domain", "They are neighbors in the map", "They appear together in a constraint", "They are both assigned"], correct: 2},
+                {q: "Why does CSP formulation prune search better than atomic state-space search?", choices: ["It avoids backtracking", "It assigns all variables first", "It detects constraint violations early", "It guarantees optimal solutions"], correct: 2},
+                {q: "After assigning SA = blue in the Australia problem, why is search reduced?", choices: ["SA has no neighbors", "Blue is removed from neighboring domains", "All variables become assigned", "The CSP becomes solved"], correct: 1},
+                {q: "Which type of constraint expresses \"T1 must finish before T2 starts\"?", choices: ["Unary constraint", "Binary arithmetic constraint", "Global constraint", "Preference constraint"], correct: 1},
+                {q: "The disjunctive constraint (AxleF +10 ≤ AxleB) OR (AxleB +10 ≤ AxleF) means:", choices: ["Both tasks must overlap", "The order is fixed", "The tasks must not overlap", "One task is optional"], correct: 2},
+                {q: "Why can a disjunctive constraint still be a valid CSP constraint?", choices: ["It is linear", "It reduces to allowed value pairs", "It is unary", "It has a single solution"], correct: 1},
+                {q: "Which CSP has a finite discrete domain?", choices: ["Job scheduling without deadlines", "Linear programming", "Map coloring", "Continuous optimization"], correct: 2},
+                {q: "Which CSP has an infinite domain?", choices: ["Sudoku", "8-queens", "Job scheduling with no time limit", "Map coloring"], correct: 2},
+                {q: "Why must infinite-domain CSPs use implicit constraints?", choices: ["Explicit constraints are incomplete", "Domains cannot be enumerated", "They have no solutions", "They require arc consistency"], correct: 1},
+                {q: "Which type of constraint is undecidable in general?", choices: ["Linear constraints over integers", "Binary constraints", "Nonlinear constraints over integers", "Unary constraints"], correct: 2},
+                {q: "Linear programming problems are:", choices: ["NP-complete", "Undecidable", "Polynomial-time solvable", "Discrete-domain CSPs"], correct: 2},
+                {q: "Which constraint restricts only one variable?", choices: ["Binary", "Unary", "Global", "Preference"], correct: 1},
+                {q: "A binary CSP contains:", choices: ["Only binary constraints", "Only unary constraints", "Unary and binary constraints", "Any number of constraints"], correct: 2},
+                {q: "Which constraint involves an arbitrary number of variables?", choices: ["Unary", "Binary", "Ternary", "Global"], correct: 3},
+                {q: "Which is a classic example of a global constraint?", choices: ["X ≠ Y", "X + Y = Z", "Alldiff(X1,…,Xn)", "X > 3"], correct: 2},
+                {q: "In cryptarithmetic, Alldiff(F,T,U,W,R,O) ensures:", choices: ["Digits increase left to right", "No two letters share a digit", "The sum is correct", "No carry occurs"], correct: 1},
+                {q: "A constraint hypergraph differs from a constraint graph because it:", choices: ["Has weighted edges", "Represents n-ary constraints explicitly", "Uses only binary constraints", "Removes variables"], correct: 1},
+                {q: "Which transformation turns constraints into variables?", choices: ["Binary expansion", "Dual graph transformation", "Hypergraph reduction", "Arc consistency"], correct: 1},
+                {q: "Why prefer a global constraint over binary constraints?", choices: ["It guarantees solutions", "It simplifies domains", "It enables stronger and faster inference", "It eliminates NP-completeness"], correct: 2},
+                {q: "A CSP with preferences is called:", choices: ["Binary CSP", "Global CSP", "Constrained optimization problem", "Linear program"], correct: 2}
+            ],
+            2: [
+                // Questions 1-36 (Page 6)
+                {q: "What is the main goal of constraint propagation?", choices: ["Increase domain size", "Reduce domains using constraints", "Assign all variables", "Replace search completely"], correct: 1},
+                {q: "Constraint propagation can be applied", choices: ["Only before search", "Only after search", "Before or during search", "Only at the end"], correct: 2},
+                {q: "Node consistency removes values that violate", choices: ["Binary constraints", "Ternary constraints", "Unary constraints", "Global constraints"], correct: 2},
+                {q: "A CSP is node-consistent if", choices: ["All arcs are consistent", "All paths are consistent", "All unary constraints are satisfied", "All variables are assigned"], correct: 2},
+                {q: "Arc consistency deals with", choices: ["One variable", "Two variables", "Three variables", "All variables"], correct: 1},
+                {q: "Variable Xi is arc-consistent w.r.t Xj if", choices: ["Xi has at least one value", "Every value in Di has support in Dj", "Xi and Xj are assigned", "Di = Dj"], correct: 1},
+                {q: "Arc consistency can detect", choices: ["All inconsistencies", "Only unary inconsistencies", "Some inconsistencies", "No inconsistencies"], correct: 2},
+                {q: "Arc consistency fails to detect inconsistency in", choices: ["Unary constraint problems", "Linear equations", "Australia map coloring with 2 colors", "Numeric CSPs"], correct: 2},
+                {q: "AC-3 enforces", choices: ["Node consistency", "Arc consistency", "Path consistency", "k-consistency"], correct: 1},
+                {q: "AC-3 stops with failure when", choices: ["Queue is empty", "No arc is consistent", "A domain becomes empty", "All variables are assigned"], correct: 2},
+                {q: "In AC-3, when a domain is revised", choices: ["Stop immediately", "Add all arcs again", "Add neighbors back to the queue", "Restart algorithm"], correct: 2},
+                {q: "Worst-case time complexity of AC-3 is", choices: ["O(nd²)", "O(cd²)", "O(cd³)", "O(n³)"], correct: 2},
+                {q: "Path consistency involves", choices: ["Single variables", "Pairs of variables", "Triples of variables", "All variables"], correct: 2},
+                {q: "Path consistency is stronger than", choices: ["Node consistency", "Arc consistency", "k-consistency", "Global consistency"], correct: 1},
+                {q: "Path consistency checks consistency of", choices: ["Values", "Nodes", "Paths Xi–Xm–Xj", "Entire graph"], correct: 2},
+                {q: "1-consistency is equivalent to", choices: ["Arc consistency", "Path consistency", "Node consistency", "Global consistency"], correct: 2},
+                {q: "2-consistency is equivalent to", choices: ["Node consistency", "Arc consistency", "Path consistency", "Strong consistency"], correct: 1},
+                {q: "In binary CSPs, 3-consistency equals", choices: ["Arc consistency", "Node consistency", "Path consistency", "Bounds consistency"], correct: 2},
+                {q: "A CSP is strongly k-consistent if it is", choices: ["Only k-consistent", "Only node-consistent", "k-consistent and all lower levels", "Globally consistent"], correct: 2},
+                {q: "Strong n-consistency guarantees", choices: ["No constraints", "No domains", "No backtracking", "No variables"], correct: 2},
+                {q: "Enforcing strong n-consistency is", choices: ["Polynomial", "Linear", "Exponential", "Constant"], correct: 2},
+                {q: "Global constraints involve", choices: ["One variable", "Two variables", "Fixed number of variables", "Arbitrary number of variables"], correct: 3},
+                {q: "Alldiff constraint requires", choices: ["All values equal", "All variables assigned", "All values different", "All domains same"], correct: 2},
+                {q: "Alldiff is inconsistent when", choices: ["Variables < values", "Variables = values", "Variables > distinct values", "Domains are equal"], correct: 2},
+                {q: "Resource constraint is also called", choices: ["Alldiff", "Exactly", "AtMost", "AtLeast"], correct: 2},
+                {q: "AtMost(10, X1, X2) means", choices: ["X1 = X2 = 10", "X1 − X2 ≤ 10", "X1 + X2 ≤ 10", "X1 + X2 ≥ 10"], correct: 2},
+                {q: "Simple inconsistency check for AtMost uses", choices: ["Maximum sum", "Average sum", "Minimum sum", "Random sum"], correct: 2},
+                {q: "If minimum sum > limit, then", choices: ["Propagate", "Search", "Inconsistency detected", "Increase domain"], correct: 2},
+                {q: "Bounds propagation works on", choices: ["Exact values", "Binary domains", "Lower and upper bounds", "Assigned values"], correct: 2},
+                {q: "Bounds propagation is useful for", choices: ["Small domains", "Large integer domains", "Boolean CSPs", "Tree CSPs"], correct: 1},
+                {q: "A CSP is bounds-consistent if", choices: ["All values work", "Min and max have support", "Only min works", "Only max works"], correct: 1},
+                {q: "In constraint X + Y = C, minimum X is", choices: ["C − min(Y)", "C − max(Y)", "min(Y) − C", "max(Y) – C"], correct: 1},
+                {q: "In bounds propagation, to minimize X you", choices: ["Minimize Y", "Maximize Y", "Ignore Y", "Assign Y"], correct: 1},
+                {q: "Sudoku constraints are mainly", choices: ["Unary", "Binary", "Alldiff", "Resource"], correct: 2},
+                {q: "AC-3 can fully solve", choices: ["All Sudoku puzzles", "Hard Sudoku puzzles", "Easy Sudoku puzzles", "No Sudoku puzzles"], correct: 2},
+                {q: "Naked triples is a technique related to", choices: ["Arc consistency", "Path consistency", "Alldiff consistency", "Node consistency"], correct: 2},
+
+                // Questions 37-68 (Page 7)
+                {q: "Constraint propagation differs from standard state-space search mainly because it:", choices: ["Expands successor nodes faster", "Assigns all variables at once", "Reduces domains without assigning variables", "Avoids constraints entirely"], correct: 2},
+                {q: "Constraint propagation can completely solve a CSP without search when:", choices: ["All constraints are binary", "All variables have finite domains", "All domains are reduced to size 1", "The CSP is arc-consistent"], correct: 2},
+                {q: "Node consistency removes values that violate:", choices: ["Binary constraints", "Unary constraints", "Global constraints", "Path constraints"], correct: 1},
+                {q: "A CSP is node-consistent if:", choices: ["All arcs are consistent", "Every domain is non-empty", "Every variable satisfies its unary constraints", "All variables have equal domain sizes"], correct: 2},
+                {q: "Why do many CSP solvers assume only binary constraints?", choices: ["Unary constraints are unsolvable", "Higher-order constraints cannot be enforced", "Unary and n-ary constraints can be eliminated or transformed", "Binary constraints are faster to check than unary ones"], correct: 2},
+                {q: "A value x ∈ Di is removed during arc consistency if:", choices: ["It violates any unary constraint", "No value in any neighboring domain supports it", "It violates at least one global constraint", "It appears too frequently"], correct: 1},
+                {q: "Arc consistency guarantees that:", choices: ["Every CSP has a solution", "Every remaining value is part of some solution", "Every value has local support in neighboring domains", "All constraints are satisfied"], correct: 2},
+                {q: "Why does arc consistency fail to reduce domains in Australia map-coloring?", choices: ["The constraints are unary", "All values are already forced", "Every color choice has a compatible neighbor color", "The graph is cyclic"], correct: 2},
+                {q: "In AC-3, why are arcs (Xk, Xi) re-added after revising Di?", choices: ["To recheck unary constraints", "Because constraints are directional", "A reduction in Di may affect neighbors", "To ensure node consistency"], correct: 2},
+                {q: "AC-3 terminates unsuccessfully when:", choices: ["The queue becomes empty", "A constraint is violated", "A domain becomes empty", "All arcs are consistent"], correct: 2},
+                {q: "Worst-case time complexity of AC-3 is:", choices: ["O(n²d)", "O(cd²)", "O(cd³)", "O(d^n)"], correct: 2},
+                {q: "Arc consistency is equivalent to:", choices: ["1-consistency", "2-consistency", "3-consistency", "Strong consistency"], correct: 1},
+                {q: "Path consistency strengthens CSPs by:", choices: ["Reducing domains using reminder constraints", "Adding new unary constraints", "Tightening binary constraints using triples of variables", "Assigning values directly"], correct: 2},
+                {q: "Arc consistency cannot detect inconsistency in 2-color Australia because:", choices: ["Constraints are global", "Each constraint is satisfiable in isolation", "The domains are too large", "Unary constraints dominate"], correct: 1},
+                {q: "A pair {Xi, Xj} is path-consistent wrt Xm if:", choices: ["Xm can take any value", "Every assignment to Xi, Xj satisfies all constraints", "Every consistent assignment to Xi,Xj extends to Xm", "Xi and Xj are arc-consistent"], correct: 2},
+                {q: "3-consistency in binary CSPs is equivalent to:", choices: ["Node consistency", "Arc consistency", "Path consistency", "Bounds consistency"], correct: 2},
+                {q: "Strongly k-consistent means:", choices: ["Only k-consistency holds", "k-consistency plus all lower levels", "Only arc and path consistency", "Domains are singleton"], correct: 1},
+                {q: "If a CSP is strongly n-consistent, solving it requires:", choices: ["Backtracking search", "No search, only forward assignment", "Exponential time", "Constraint learning"], correct: 1},
+                {q: "Why is enforcing n-consistency impractical?", choices: ["It is incomplete", "It ignores global constraints", "Time and space are exponential", "It fails on cyclic graphs"], correct: 2},
+                {q: "Which statement about global constraints is TRUE?", choices: ["They must be converted to binary constraints", "They are less efficient than arc consistency", "Specialized algorithms can exploit their structure", "They apply only to Sudoku"], correct: 2},
+                {q: "An Alldiff constraint is violated when:", choices: ["Any two variables share a value", "Domains overlap", "Number of variables exceeds number of distinct values", "A variable has a singleton domain"], correct: 2},
+                {q: "Why can Alldiff propagation detect inconsistencies missed by AC-3?", choices: ["It uses unary constraints", "It reasons over sets of variables together", "It performs search", "It enforces path consistency"], correct: 1},
+                {q: "The Atmost(k, X₁,…,Xₙ) constraint is violated if:", choices: ["Any Xi > k", "Sum of maximum values exceeds k", "Sum of minimum values exceeds k", "Domains are disjoint"], correct: 2},
+                {q: "Bounds propagation differs from domain reduction because it:", choices: ["Removes individual values", "Uses upper and lower bounds only", "Applies only to binary constraints", "Requires arc consistency"], correct: 1},
+                {q: "A CSP is bounds-consistent if:", choices: ["Every domain is an interval", "Only lower bounds are supported", "Both bounds of each variable have support", "All solutions lie within bounds"], correct: 2},
+                {q: "Which operation is typically done before search begins?", choices: ["Backtracking", "Value ordering", "Enforcing node consistency", "Guessing assignments"], correct: 2},
+                {q: "Each binary constraint corresponds to how many arcs in AC-3?", choices: ["1", "2", "d", "n"], correct: 1},
+                {q: "Arc consistency primarily reduces:", choices: ["The number of variables", "Unary constraints", "Domain sizes", "The number of constraints"], correct: 2},
+                {q: "Which statement is TRUE?", choices: ["Node consistency = 2-consistency", "Arc consistency = 1-consistency", "Path consistency = 3-consistency (binary CSPs)", "Strong k-consistency ignores lower levels"], correct: 2},
+                {q: "Why is strong n-consistency rarely used in practice?", choices: ["It misses solutions", "It is incomplete", "It requires exponential time and space", "It cannot handle binary constraints"], correct: 2},
+                {q: "In Sudoku, each row, column, and box is modeled as:", choices: ["Binary constraints", "Unary constraints", "Alldiff constraints", "Resource constraints"], correct: 2},
+                {q: "Expanding Alldiff into binary constraints:", choices: ["Always improves inference", "Is equivalent in strength", "Can lose inference power", "Is required for AC-3"], correct: 2}
+            ],
+            3: [
+                // Questions 1-31 (Page 6)
+                {q: "In CSP backtracking, why are complete assignments only at depth n?", choices: ["Each constraint is binary", "Each variable is assigned exactly once", "Domains shrink monotonically", "Variables are revisited"], correct: 1},
+                {q: "Which feature of CSPs removes the factorial blow-up in search trees?", choices: ["Symmetry", "Independence", "Consistency", "Commutativity"], correct: 3},
+                {q: "In backtracking search, what does a node represent?", choices: ["A constraint graph", "A domain", "A partial assignment", "A solution"], correct: 2},
+                {q: "Why do we not branch on different variable orders?", choices: ["Variable order is irrelevant to solutions", "Variable order does not change constraints", "Variable order is chosen randomly", "Variable assignment is commutative"], correct: 3},
+                {q: "Which heuristic is best described as \"fail-first\"?", choices: ["Degree heuristic", "MRV", "Least-constraining value", "Random ordering"], correct: 1},
+                {q: "MRV immediately detects failure when a variable has:", choices: ["Maximum degree", "No neighbors", "An empty domain", "Multiple constraints"], correct: 2},
+                {q: "When MRV ties occur, which heuristic is commonly used next?", choices: ["Least-constraining value", "Degree heuristic", "Forward checking", "Backjumping"], correct: 1},
+                {q: "The degree heuristic prefers variables that:", choices: ["Have smallest domains", "Are unassigned", "Appear last in ordering", "Constrain many other variables"], correct: 3},
+                {q: "Least-constraining value ordering tries to:", choices: ["Maximize pruning immediately", "Delay failure", "Reduce future domain eliminations", "Enforce arc consistency"], correct: 2},
+                {q: "Value ordering is \"fail-last\" because:", choices: ["All values must be tried", "Only one solution is required", "Domains are static", "Values do not affect constraints"], correct: 1},
+                {q: "Forward checking removes values from:", choices: ["All variables", "Assigned variables", "Neighboring unassigned variables", "The constraint graph"], correct: 2},
+                {q: "Forward checking detects inconsistency when:", choices: ["A constraint is violated", "A variable is reassigned", "A value is inconsistent", "A domain becomes empty"], correct: 3},
+                {q: "Which situation is NOT detected by forward checking?", choices: ["Direct inconsistency with assigned variable", "Empty domain of a neighbor", "Inconsistency among unassigned variables", "Constraint violation"], correct: 2},
+                {q: "MAC differs from forward checking because it:", choices: ["Applies AC-3 recursively", "Uses heuristics", "Ignores variable order", "Prevents backtracking"], correct: 0},
+                {q: "MAC is strictly stronger than forward checking because it:", choices: ["Is faster", "Prunes fewer branches", "Considers only binary constraints", "Propagates constraints beyond neighbors"], correct: 3},
+                {q: "Chronological backtracking revisits:", choices: ["The root node", "The first variable", "The most recent assignment", "The variable with highest degree"], correct: 2},
+                {q: "Why can chronological backtracking be wasteful?", choices: ["It ignores heuristics", "It changes irrelevant variables", "It skips valid solutions", "It violates consistency"], correct: 1},
+                {q: "A conflict set records:", choices: ["All constraints", "All assigned variables", "Variables causing failure", "Unassigned neighbors"], correct: 2},
+                {q: "Backjumping improves efficiency by:", choices: ["Skipping irrelevant assignments", "Removing constraints", "Enforcing consistency", "Randomizing search"], correct: 0},
+                {q: "Simple backjumping is redundant with forward checking because:", choices: ["Both use MRV", "Backjumping is weaker", "Forward checking prevents empty domains earlier", "They explore different trees"], correct: 2},
+                {q: "Conflict-directed backjumping differs because it:", choices: ["Uses domain heuristics", "Reasons about deeper causes of failure", "Eliminates constraint propagation", "Works only with MAC"], correct: 1},
+                {q: "A no-good represents:", choices: ["A failed variable", "A violated constraint", "A useless heuristic", "A forbidden combination of assignments"], correct: 3},
+                {q: "Constraint learning helps by:", choices: ["Reducing domain sizes", "Preventing repeated exploration of failures", "Guaranteeing optimality", "Removing variables"], correct: 1},
+                {q: "Recording no-goods is most useful when:", choices: ["Domains are small", "Only one variable exists", "Partial assignments may reoccur", "Using random ordering"], correct: 2},
+                {q: "Modern CSP solvers rely heavily on constraint learning because it:", choices: ["Eliminates heuristics", "Avoids recursion", "Ensures completeness", "Dramatically reduces repeated search"], correct: 3},
+                {q: "The branching factor at the root of naive depth-limited CSP search is n·d because:", choices: ["There are n constraints", "Each variable has d neighbors", "Any variable can be assigned any value", "Variables must be assigned in order"], correct: 2},
+                {q: "Exploiting commutativity reduces the number of leaves to d^n because:", choices: ["Values are chosen greedily", "Each variable is assigned once", "Variable ordering is ignored", "Only one variable is branched on at each depth"], correct: 3},
+                {q: "In BACKTRACKING-SEARCH, which operation actually extends the current state?", choices: ["SELECT-UNASSIGNED-VARIABLE", "ORDER-DOMAIN-VALUES", "Adding {var = value} to assignment", "INFERENCE"], correct: 2},
+                {q: "Which step ensures that temporary inferences do not corrupt future search?", choices: ["SELECT-UNASSIGNED-VARIABLE", "Removing inferences on backtrack", "ORDER-DOMAIN-VALUES", "Using MRV"], correct: 1},
+                {q: "Constraint learning improves CSP search mainly by:", choices: ["Reducing domains", "Avoiding repeated failures", "Enforcing consistency", "Removing variables"], correct: 1},
+
+                // Questions 32-60 (Page 7) - Note: Page 7 has 29 questions, so total is 60
+                {q: "In a naive depth-limited search formulation of a CSP with n variables of domain size d, the number of leaf nodes is:", choices: ["d^n", "n·d^n", "n!·d^n", "(nd)!"], correct: 2},
+                {q: "The factor of n! in the naive CSP search tree arises mainly because:", choices: ["Variables are assigned repeatedly", "Values are chosen redundantly", "Assignments are explored in all possible orders", "Constraints are rechecked multiple times"], correct: 2},
+                {q: "Commutativity in CSPs means that:", choices: ["Variable domains are interchangeable", "The order of assigning values does not affect consistency", "The order of variable assignments does not affect the final assignment", "Constraints can be reordered arbitrarily"], correct: 2},
+                {q: "Restricting the search tree to one variable choice per level reduces the number of leaves to:", choices: ["n!", "d^n", "nd", "(n−1)d"], correct: 1},
+                {q: "In BACKTRACKING-SEARCH, the algorithm backtracks over:", choices: ["Variable selection choices", "Domain ordering choices", "Value assignments only", "Inference rules only"], correct: 2},
+                {q: "BACKTRACKING-SEARCH differs from standard DFS mainly because it:", choices: ["Creates new states for each node", "Stores all partial assignments", "Modifies a single assignment in place", "Explores breadth-first"], correct: 2},
+                {q: "The MRV heuristic selects the variable that:", choices: ["Participates in the most constraints", "Has the smallest remaining legal domain", "Was most recently assigned", "Has the largest domain initially"], correct: 1},
+                {q: "MRV is also known as the \"fail-first\" heuristic because it:", choices: ["Causes early failure of the entire search", "Detects inconsistencies before assignment", "Selects variables most likely to fail soon", "Forces constraint propagation"], correct: 2},
+                {q: "The degree heuristic is primarily intended to:", choices: ["Reduce current domain sizes", "Minimize immediate constraint violations", "Reduce future branching factor", "Improve value ordering"], correct: 2},
+                {q: "The degree heuristic is most useful when:", choices: ["MRV produces a unique choice", "Variables have unequal domain sizes", "MRV cannot distinguish between variables", "Constraints are unary"], correct: 2},
+                {q: "The least-constraining-value heuristic prefers values that:", choices: ["Are consistent with all constraints", "Minimize conflicts with already assigned variables", "Eliminate the fewest options for neighbors", "Maximize constraint satisfaction"], correct: 2},
+                {q: "Value ordering is \"fail-last\" because:", choices: ["All values must be tested eventually", "We want to postpone failure as long as possible", "We only need one solution", "Failures are inevitable"], correct: 2},
+                {q: "Forward checking enforces arc consistency between:", choices: ["All pairs of unassigned variables", "The assigned variable and all others", "The assigned variable and its neighbors", "All variables recursively"], correct: 2},
+                {q: "Forward checking detects inconsistency when:", choices: ["A constraint is violated", "A domain becomes empty", "Two neighbors share the same value", "AC-3 fails"], correct: 1},
+                {q: "Forward checking fails to detect some inconsistencies because it:", choices: ["Does not revise arcs", "Does not propagate constraints recursively", "Does not consider binary constraints", "Stops after variable selection"], correct: 1},
+                {q: "MAC differs from forward checking because MAC:", choices: ["Uses MRV dynamically", "Applies AC-3 after each assignment", "Revises all arcs in the CSP", "Avoids backtracking"], correct: 1},
+                {q: "MAC starts AC-3 with a queue containing:", choices: ["All arcs in the CSP", "Only arcs involving assigned variables", "Arcs from neighbors to the newly assigned variable", "Arcs from the variable to its neighbors"], correct: 2},
+                {q: "MAC is strictly more powerful than forward checking because it:", choices: ["Detects all constraint violations", "Performs deeper lookahead", "Revises domains recursively", "Uses conflict sets"], correct: 2},
+                {q: "Chronological backtracking always backtracks to:", choices: ["The variable with the largest conflict set", "The most recently assigned variable", "The earliest conflicting variable", "The variable chosen by MRV"], correct: 1},
+                {q: "Simple backjumping differs from chronological backtracking because it:", choices: ["Jumps to the earliest variable", "Uses constraint propagation", "Backtracks to a variable in the conflict set", "Avoids domain restoration"], correct: 2},
+                {q: "A conflict set for a variable X contains:", choices: ["Variables inconsistent with X", "Variables that eliminate all values of X", "Variables that violate constraints with X", "Variables previously assigned"], correct: 1},
+                {q: "Forward checking can supply conflict sets because it:", choices: ["Tracks violated constraints", "Records which assignments delete domain values", "Stores inconsistent states", "Runs AC-3"], correct: 1},
+                {q: "Simple backjumping is redundant when combined with forward checking because:", choices: ["Forward checking avoids dead ends", "Backjumping never skips useful variables", "Forward checking prunes the same branches", "Conflict sets become empty"], correct: 2},
+                {q: "Conflict-directed backjumping differs from simple backjumping because it:", choices: ["Uses smaller conflict sets", "Includes future variables in conflict analysis", "Only backtracks one level", "Requires MAC"], correct: 0},
+                {q: "The key insight behind conflict-directed backjumping is that:", choices: ["Failure may involve multiple variables jointly", "Domains fail independently", "MRV is insufficient", "Chronological order is irrelevant"], correct: 0},
+                {q: "When variable Xj fails completely, the algorithm backjumps to:", choices: ["The earliest variable in conf(Xj)", "The variable with the smallest domain", "The most recent variable in conf(Xj)", "The variable with highest degree"], correct: 2},
+                {q: "The conflict set update rule conf(Xi) ← conf(Xi) ∪ conf(Xj) − {Xi} means that:", choices: ["Conflicts are replaced", "Conflicts are propagated backward", "Conflicts are minimized", "Conflicts are reset"], correct: 1},
+                {q: "A no-good represents:", choices: ["A violated constraint", "A failed variable assignment", "A minimal inconsistent partial assignment", "An empty domain"], correct: 2},
+                {q: "Constraint learning improves search mainly by:", choices: ["Reducing domain sizes", "Avoiding repeated exploration of known failures", "Increasing propagation strength", "Changing heuristics dynamically"], correct: 1}
+            ],
+            4: [
+                // Questions 1-25 (Page 4)
+                {q: "Local search for CSPs uses which type of state formulation?", choices: ["Partial-state formulation", "Constraint graph formulation", "Complete-state formulation", "Binary-state formulation"], correct: 2},
+                {q: "In local search for CSPs, a state is considered a solution when:", choices: ["All variables are assigned", "No constraints are violated", "The heuristic value is minimal", "The search terminates"], correct: 1},
+                {q: "In min-conflicts, the algorithm modifies:", choices: ["Multiple variables per step", "One randomly chosen variable", "One conflicted variable", "The variable with maximum degree"], correct: 2},
+                {q: "Which value does min-conflicts choose for a selected variable?", choices: ["The most frequent value", "A random value", "The least-used value", "The value with minimum conflicts"], correct: 3},
+                {q: "Tie-breaking in min-conflicts is usually handled by:", choices: ["Choosing the smallest value", "Using MRV", "Backtracking", "Random selection"], correct: 3},
+                {q: "Why does min-conflicts perform exceptionally well on n-queens?", choices: ["The problem is tree-structured", "Solutions are densely distributed", "Domains are binary", "Constraints are independent"], correct: 1},
+                {q: "After the initial assignment, the expected runtime of min-conflicts on n-queens is:", choices: ["Exponential in n", "Linear in n", "Roughly independent of n", "Quadratic in n"], correct: 2},
+                {q: "The success of min-conflicts in large CSPs led to research on:", choices: ["Constraint propagation", "Complete search algorithms", "Binary CSPs", "Easy vs. hard problem landscapes"], correct: 3},
+                {q: "A \"conflicted variable\" is one that:", choices: ["Has no legal values", "Violates at least one constraint", "Has the smallest domain", "Appears in many constraints"], correct: 1},
+                {q: "The CONFLICTS function computes:", choices: ["Number of violated variables", "Number of inconsistent values", "Number of violated constraints", "Degree of the variable"], correct: 2},
+                {q: "Why can local search handle very large CSPs efficiently?", choices: ["It stores the full search tree", "It uses recursion", "It reasons over partial assignments", "It uses constant memory"], correct: 3},
+                {q: "A major weakness of local search for CSPs is that it:", choices: ["Cannot handle constraints", "Is incomplete (stuck in a plateau)", "Requires heuristics", "Uses randomization"], correct: 1},
+                {q: "A plateau in the search landscape occurs when:", choices: ["All constraints are satisfied", "All neighbors have worse scores", "Many states have equal evaluation", "The algorithm backtracks"], correct: 2},
+                {q: "Plateau search allows the algorithm to:", choices: ["Backtrack chronologically", "Make sideways moves", "Restart randomly", "Enforce arc consistency"], correct: 1},
+                {q: "Why are plateaus common in CSP landscapes under min-conflicts?", choices: ["Constraints are weighted", "Domains are large", "Solutions are isolated", "Many assignments are nearly correct"], correct: 3},
+                {q: "Tabu search helps local search by:", choices: ["Reducing domain sizes", "Preventing revisiting recent states", "Enforcing consistency", "Selecting better variables"], correct: 1},
+                {q: "Simulated annealing helps escape plateaus by:", choices: ["Restarting the search", "Penalizing conflicts", "Allowing uphill moves probabilistically", "Learning constraints"], correct: 2},
+                {q: "Constraint weighting differs from min-conflicts because it:", choices: ["Uses backtracking", "Assigns costs to constraints", "Eliminates plateaus completely", "Requires arc consistency"], correct: 1},
+                {q: "Initially, constraint weights are usually set to:", choices: ["0", "Random values", "1", "The domain size"], correct: 2},
+                {q: "In constraint weighting, weights are increased for constraints that are:", choices: ["Satisfied", "Frequently selected", "Binary", "Violated"], correct: 3},
+                {q: "One benefit of constraint weighting is that it:", choices: ["Guarantees optimality", "Eliminates local minima", "Adds topography to plateaus", "Prevents random walks"], correct: 2},
+                {q: "Constraint weighting is said to add \"learning\" because:", choices: ["Constraints are removed", "Difficult constraints gain higher weights", "Variables are reordered", "Domains shrink permanently"], correct: 1},
+                {q: "Local search is especially useful in online CSPs because it:", choices: ["Always finds optimal solutions", "Can repair existing solutions", "Uses constraint propagation", "Avoids randomness"], correct: 1},
+                {q: "Compared to backtracking, local search repairs schedules with:", choices: ["More constraint checks", "Higher memory usage", "Fewer changes to the solution", "Guaranteed completeness"], correct: 2},
+                {q: "Why is backtracking inefficient for dynamic scheduling problems?", choices: ["It ignores constraints", "It restarts from scratch", "It cannot handle large domains", "It uses heuristics"], correct: 1},
+
+                // Questions 26-45 (Page 5)
+                {q: "Local search for CSPs differs from backtracking primarily because it:", choices: ["Uses heuristics instead of constraints", "Operates on complete assignments rather than partial ones", "Assigns variables in a fixed order", "Guarantees a solution if one exists"], correct: 1},
+                {q: "In min-conflicts, selecting a conflicted variable means choosing one that:", choices: ["Participates in the highest number of constraints", "Violates at least one constraint in the current assignment", "Has no legal values remaining", "Causes conflicts with all neighbors"], correct: 1},
+                {q: "The value chosen by min-conflicts is the one that:", choices: ["Eliminates the maximum number of conflicts", "Minimizes the number of violated constraints after assignment", "Is consistent with all neighbors", "Produces a legal assignment"], correct: 1},
+                {q: "The CONFLICTS function in min-conflicts counts:", choices: ["Conflicting variables only", "Conflicting values only", "Violated constraints only", "Violated variables and constraints"], correct: 2},
+                {q: "Min-conflicts is considered incomplete because it:", choices: ["Uses randomness in variable selection", "Can cycle among equally good states", "May fail to find a solution even if one exists", "Does not explore the full search tree"], correct: 2},
+                {q: "The surprising efficiency of min-conflicts on n-queens is mainly due to:", choices: ["The absence of local minima", "The low branching factor", "The dense distribution of solutions", "The symmetry of the constraint graph"], correct: 2},
+                {q: "When min-conflicts allows sideways moves, it is attempting to escape:", choices: ["Global minima", "Dead-end states", "Constraint violations", "Plateaus in the search landscape"], correct: 3},
+                {q: "A plateau in CSP local search is best described as:", choices: ["A region where all constraints are satisfied", "A region where all neighbors are worse", "A region where many states have equal conflict counts", "A region where constraints cannot be violated"], correct: 2},
+                {q: "Tabu search helps min-conflicts primarily by:", choices: ["Penalizing violated constraints", "Preventing immediate revisits to recent states", "Randomizing variable selection", "Restarting the search periodically"], correct: 1},
+                {q: "Simulated annealing differs from basic min-conflicts because it:", choices: ["Always accepts better moves", "Allows worse moves with decreasing probability", "Avoids plateaus entirely", "Removes randomness from search"], correct: 1},
+                {q: "Constraint weighting modifies min-conflicts by selecting moves that minimize:", choices: ["The number of violated constraints", "The number of conflicted variables", "The total weight of violated constraints", "The number of recently violated constraints"], correct: 2},
+                {q: "Increasing the weights of violated constraints mainly serves to:", choices: ["Eliminate those constraints", "Increase the cost of future violations", "Reduce the number of constraints", "Force consistency"], correct: 1},
+                {q: "Constraint weighting is said to add \"topography\" because it:", choices: ["Creates local minima", "Introduces gradients on flat plateaus", "Removes flat regions entirely", "Penalizes all constraints equally"], correct: 1},
+                {q: "The \"learning\" aspect of constraint weighting refers to the fact that:", choices: ["Domains permanently shrink", "Difficult constraints accumulate higher weights", "Variables are reordered dynamically", "Previous states are stored"], correct: 1},
+                {q: "Local search is especially suitable for online CSPs because it:", choices: ["Guarantees minimal changes", "Repairs solutions incrementally", "Avoids constraint propagation", "Requires no heuristics"], correct: 1},
+                {q: "Compared to backtracking, local search is more likely to:", choices: ["Find all solutions", "Use more memory", "Preserve most of the existing assignment", "Detect inconsistencies early"], correct: 2},
+                {q: "A key limitation of local search in CSPs is that it:", choices: ["Cannot use heuristics", "Requires arc consistency", "Is demonstrateably incomplete", "Cannot handle binary constraints"], correct: 2},
+                {q: "Random restarts in local search primarily address the problem of:", choices: ["High memory usage", "Poor initial assignments", "Getting stuck in local minima or plateaus", "Constraint violations"], correct: 2},
+                {q: "In min-conflicts, randomness is essential mainly to:", choices: ["Speed up convergence", "Break ties and avoid cycles", "Guarantee optimal solutions", "Remove plateaus"], correct: 1},
+                {q: "Which statement best captures the difference between min-conflicts and backtracking?", choices: ["Min-conflicts searches deeper than backtracking", "Min-conflicts reasons about constraints, backtracking does not", "Min-conflicts improves a complete assignment, backtracking builds one", "Min-conflicts always outperforms backtracking"], correct: 2}
+            ],
+            5: [
+                // Questions 1-16 (Page 4)
+                {q: "What does an independent subproblem mean in a CSP?", choices: ["A problem where all variables are connected to each other", "A subproblem that can be solved separately, and its solution combined with others gives a solution for the whole CSP", "A subproblem that requires backtracking to solve", "A problem that has only one solution"], correct: 1},
+                {q: "How can independent subproblems be identified in a CSP?", choices: ["By checking variable domains", "By finding connected components in the constraint graph", "By using min-conflicts heuristic", "By applying symmetry-breaking constraints"], correct: 1},
+                {q: "What is the time complexity of solving n/c independent subproblems, each of size c with domain size d?", choices: ["O(dⁿ)", "O(d^c·n/c)", "O(n·d^c)", "O(n²·d²)"], correct: 2},
+                {q: "A tree-structured CSP has the property that:", choices: ["Every variable is connected to every other variable", "There is only one path between any two variables", "All constraints are unary", "Variables have no constraints"], correct: 1},
+                {q: "What is directional arc consistency (DAC) in a tree-structured CSP?", choices: ["Every variable is arc-consistent with all previous variables", "Every variable is arc-consistent with each variable that comes after it in a chosen ordering", "Every variable has only one allowed value", "Only leaf nodes are consistent"], correct: 1},
+                {q: "What is a topological sort in the context of tree-structured CSPs?", choices: ["Ordering variables arbitrarily", "Ordering variables such that each variable appears after its parent", "Sorting domain values of each variable", "Arranging constraints in alphabetical order"], correct: 1},
+                {q: "Why does TREE-CSP-SOLVER not require backtracking?", choices: ["Because domains are all single values", "Because DAC ensures that for any value chosen for a parent, the child has at least one consistent value", "Because trees have no constraints", "Because the algorithm uses symmetry breaking"], correct: 1},
+                {q: "What is a cycle cutset in CSPs?", choices: ["A variable with a single value", "A subset of variables that, when assigned, turns the remaining constraint graph into a tree", "A variable that breaks value symmetry", "A constraint that connects all variables"], correct: 1},
+                {q: "What is the time complexity of cutset conditioning?", choices: ["O(dⁿ)", "O(d^c·(n–c)d²)", "O(n²·d²)", "O(n·d)"], correct: 1},
+                {q: "What is the main idea of tree decomposition?", choices: ["To assign values to variables one by one", "To transform the constraint graph into a tree of clusters of variables", "To apply min-conflicts to all variables", "To remove independent subproblems"], correct: 1},
+                {q: "Which of the following is NOT a requirement of a tree decomposition?", choices: ["Every variable appears in at least one tree node", "Every pair of connected variables in the original graph appear together in at least one node", "A variable appearing in multiple nodes must appear in every node along the path connecting those nodes", "Every node must contain all variables in the CSP"], correct: 3},
+                {q: "What is tree width?", choices: ["Number of variables in a CSP", "One less than the size of the largest node in a tree decomposition", "The maximum number of constraints per variable", "Number of edges in the constraint graph"], correct: 1},
+                {q: "How can CSPs with bounded tree width be solved?", choices: ["Using brute-force search only", "In polynomial time using TREE-CSP-SOLVER on the tree decomposition", "Only with cutset conditioning", "They cannot be solved efficiently"], correct: 1},
+                {q: "What is value symmetry in CSPs?", choices: ["Symmetry in the constraint graph", "Equivalent solutions obtained by permuting variable values", "A CSP with all domains equal", "Symmetric domains for a single variable"], correct: 1},
+                {q: "How can value symmetry be reduced?", choices: ["Using directional arc consistency", "Using a symmetry-breaking constraint", "Using cutset conditioning", "Using tree decomposition"], correct: 1},
+                {q: "Why is breaking value symmetry helpful?", choices: ["It reduces the search space by eliminating equivalent solutions", "It ensures directional arc consistency", "It increases domain sizes", "It converts the graph into a tree"], correct: 0},
+
+                // Questions 17-34 (Page 5)
+                {q: "Two subproblems of a CSP are independent if:", choices: ["Their variables have disjoint domains", "Their constraints do not connect them", "Any solution of one can combine with any solution of the other", "They have the same number of variables"], correct: 2},
+                {q: "Connected components in a constraint graph correspond to:", choices: ["Variables with the same domain", "Independent subproblems", "Maximum cliques", "Nodes with high degree"], correct: 1},
+                {q: "Solving a CSP by decomposing it into independent subproblems can reduce time from O(dⁿ) to:", choices: ["O(dⁿ/2)", "O(d^c·n/c)", "O(c·d^n)", "O(d^(n−c))"], correct: 1},
+                {q: "A tree-structured CSP can be solved in linear time using:", choices: ["MRV heuristic", "Forward checking", "Directional arc consistency", "Conflict-directed backjumping"], correct: 2},
+                {q: "Directional arc consistency (DAC) requires:", choices: ["Every variable to be arc-consistent with all others", "Each variable Xi arc-consistent with variables Xj where j > i", "Arc consistency enforced only on leaves", "Consistency only for binary constraints"], correct: 1},
+                {q: "In tree-structured CSPs, choosing a topological sort ensures:", choices: ["Each parent appears after its children", "Each parent appears before its children", "MRV is maximized", "All domains are disjoint"], correct: 1},
+                {q: "Cutset conditioning works by:", choices: ["Collapsing nodes into a single variable", "Assigning values to variables so the remaining graph is a tree", "Enforcing full arc consistency", "Breaking value symmetry"], correct: 1},
+                {q: "The cycle cutset is:", choices: ["The largest connected component", "A subset of variables that, when removed, makes the graph a tree", "The minimal set of leaves", "All variables with degree > 2"], correct: 1},
+                {q: "Time complexity of cutset conditioning is:", choices: ["O(d^c·(n−c)d²)", "O(nd²)", "O(d^(n−c)·c²)", "O(nd^(c+1))"], correct: 0},
+                {q: "Tree decomposition requires:", choices: ["Every variable appears in exactly one node", "Every edge in the original graph appears in at least one node", "Variables can skip nodes along paths", "Nodes may contain duplicate constraints"], correct: 1},
+                {q: "The technical third condition of a tree decomposition ensures:", choices: ["Each variable has a unique domain", "Consistency of variable assignments across nodes", "Maximum node size is minimized", "Constraint satisfaction is optional"], correct: 1},
+                {q: "Solving a tree decomposition CSP using TREE-CSP-SOLVER has complexity:", choices: ["O(n²d)", "O(nd²)", "O(nd^(w+1))", "O(d^n)"], correct: 2},
+                {q: "Tree width is:", choices: ["The number of nodes minus one", "One less than the size of the largest node", "Minimum number of edges to remove to get a tree", "Maximum degree of the constraint graph"], correct: 1},
+                {q: "CSPs with bounded tree width are:", choices: ["Always NP-hard", "Solvable in polynomial time given the decomposition", "Only solvable using cutset conditioning", "Solvable in linear memory"], correct: 1},
+                {q: "Value symmetry in CSPs arises because:", choices: ["Variables can swap values arbitrarily", "Constraints are symmetric", "Permuting values produces multiple equivalent solutions", "Domains are identical"], correct: 2},
+                {q: "Breaking value symmetry can be achieved by:", choices: ["Removing redundant variables", "Enforcing an arbitrary ordering on values", "Applying MRV heuristic", "Enforcing DAC"], correct: 1},
+                {q: "Symmetry-breaking constraints:", choices: ["Reduce the search space by factor of d!", "Increase the number of solutions", "Change the original CSP solution", "Eliminate independent subproblems"], correct: 0},
+                {q: "In practice, eliminating all value symmetries:", choices: ["Is linear time", "Is NP-hard", "Always reduces memory use", "Is unnecessary in tree-structured CSPs"], correct: 1}
+            ]
+        };
+
+        let currentSection = 0;
+        let currentQuestionIndex = 0;
+        let score = { correct: 0, incorrect: 0 };
+        let selectedAnswer = null;
+
+        function startQuiz(section) {
+            currentSection = section;
+            currentQuestionIndex = 0;
+            score = { correct: 0, incorrect: 0 };
+            selectedAnswer = null;
+
+            document.getElementById('sectionsView').style.display = 'none';
+            document.getElementById('quizView').style.display = 'block';
+            document.getElementById('sectionTitle').textContent = `Section ${section}`;
+
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const questions = quizData[currentSection];
+            const question = questions[currentQuestionIndex];
+
+            document.getElementById('progress').textContent =
+                `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            document.getElementById('questionText').textContent = question.q;
+
+            const choicesDiv = document.getElementById('choices');
+            choicesDiv.innerHTML = '';
+
+            question.choices.forEach((choice, index) => {
+                const choiceDiv = document.createElement('div');
+                choiceDiv.className = 'choice';
+                choiceDiv.textContent = choice;
+                choiceDiv.onclick = () => selectAnswer(index);
+                choicesDiv.appendChild(choiceDiv);
+            });
+
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('nextBtn').disabled = true;
+
+            // Enable/disable Previous button
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+
+            document.getElementById('scoreText').textContent =
+                `Correct: ${score.correct} | Incorrect: ${score.incorrect}`;
+
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(index) {
+            if (selectedAnswer !== null) return;
+
+            selectedAnswer = index;
+            const question = quizData[currentSection][currentQuestionIndex];
+            const choices = document.querySelectorAll('.choice');
+
+            choices.forEach((choice, i) => {
+                choice.classList.add('disabled');
+                if (i === question.correct) {
+                    choice.classList.add('correct');
+                } else if (i === index) {
+                    choice.classList.add('incorrect');
+                }
+            });
+
+            const feedback = document.getElementById('feedback');
+            if (index === question.correct) {
+                feedback.className = 'feedback correct';
+                feedback.textContent = '✓ Correct!';
+                score.correct++;
+            } else {
+                feedback.className = 'feedback incorrect';
+                feedback.textContent = `✗ Incorrect. The correct answer is: ${question.choices[question.correct]}`;
+                score.incorrect++;
+            }
+            feedback.style.display = 'block';
+
+            document.getElementById('nextBtn').disabled = false;
+            document.getElementById('scoreText').textContent =
+                `Correct: ${score.correct} | Incorrect: ${score.incorrect}`;
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            const questions = quizData[currentSection];
+
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                alert(`Section ${currentSection} Complete!\n\nCorrect: ${score.correct}\nIncorrect: ${score.incorrect}\nScore: ${Math.round((score.correct / questions.length) * 100)}%`);
+                backToSections();
+            }
+        }
+
+        function backToSections() {
+            document.getElementById('quizView').style.display = 'none';
+            document.getElementById('sectionsView').style.display = 'grid';
+        }
+    </script>
+</body>
+</html>
